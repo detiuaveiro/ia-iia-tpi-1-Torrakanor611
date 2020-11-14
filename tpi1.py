@@ -8,6 +8,7 @@ class MyTree(SearchTree):
 
     def __init__(self,problem, strategy='breadth'): 
         super().__init__(problem,strategy)
+        self.mylist = []
 
     def hybrid1_add_to_open(self,lnewnodes):
         # for i in range(len(lnewnodes) - 1):
@@ -15,7 +16,8 @@ class MyTree(SearchTree):
         #         self.open_nodes.extend([lnewnodes[i]])
         #     else:
         #         self.open_nodes[:0] = [lnewnodes[i]]
-        self.open_nodes.extend(lnewnodes)
+        self.mylist.extend(lnewnodes)
+        len("len of mylist: "+ len(self.))
     
     def hybrid2_add_to_open(self,lnewnodes):
         self.open_nodes.extend(lnewnodes)
