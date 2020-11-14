@@ -1,6 +1,7 @@
 # Pedro Abreu, 93240, MIECT
 # aconselhei-me com Maria Rocha, LEI, 93320
 # também com Ana Filipe, MIECT, 93350 
+# e consultei múltiplos websites na net
 
 from tree_search import *
 from cidades import *
