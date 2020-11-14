@@ -2,50 +2,82 @@ from tree_search import *
 from cidades import *
 from strips import *
 import sys
+import operator
 
 
 class MyTree(SearchTree):
 
     def __init__(self,problem, strategy='breadth'): 
         super().__init__(problem,strategy)
-        self.mylist = []
+        # self.from_init = MyTree(self.problem)
+        # self.to_goal = MyTree(self.problem)
 
     def hybrid1_add_to_open(self,lnewnodes):
-        # for i in range(len(lnewnodes) - 1):
-        #     if i % 2 == 0:
-        #         self.open_nodes.extend([lnewnodes[i]])
-        #     else:
-        #         self.open_nodes[:0] = [lnewnodes[i]]
-        self.mylist.extend(lnewnodes)
-        len("len of mylist: "+ len(self.))
+        for i in range(len(lnewnodes)):
+            if i % 2 != 0:
+                self.open_nodes.extend([lnewnodes[len(lnewnodes) - 1 - i]])
+            else:
+                self.open_nodes.insert(0, lnewnodes[i])
     
     def hybrid2_add_to_open(self,lnewnodes):
         self.open_nodes.extend(lnewnodes)
-        self.open_nodes = sorted(self.open_nodes, key=sorter)
+        self.open_nodes = sorted(self.open_nodes, key = lambda x : x.depth - x.offset)
+        # if len(self.open_nodes) == 0:
+        #     if len(lnewnodes) != 0:
+        #         self.open_nodes.append(lnewnodes.pop(0))
+        # for newnode in lnewnodes:
+        #     for node in self.open_nodes:
+        #         if get_num(newnode) > get_num(node):
+        #             self.open_nodes.insert(i, newnode)
+
 
     def search2(self):
         while self.open_nodes != []:
-            # print(len(self.open_nodes))
             node = self.open_nodes.pop(0)
             if self.problem.goal_test(node.state):
                 self.terminal = len(self.open_nodes)+1
                 self.solution = node
-                print(self.get_path(node))
                 return self.get_path(node)
             self.non_terminal+=1
             node.children = []
             for a in self.problem.domain.actions(node.state):
                 newstate = self.problem.domain.result(node.state,a)
                 if newstate not in self.get_path(node):
-                    newnode = SearchNode(newstate,node)
+                    newnode = Aux(newstate,node)
+                    newnode.depth = get_depth(newnode)
+                    # offset = 0
+                    # for x in self.root.children:
+                    #     newnode.offset += get_num(x, node, offset)
+                    #     offset = 0
                     node.children.append(newnode)
+                    newnode.offset = node.children.index(newnode)
             self.add_to_open(node.children)
         print("sou none type!")
         return None
 
     def search_from_middle(self):
-        #IMPLEMENT HERE
-        pass
+        return self.do_search(self.problem.initial, self.problem.goal)
+
+    def do_search(self, city1, city2):
+        m = self.problem.domain.middle(city1, city2)
+
+        # print("city1: " + city1)
+        # print("city2: " + city2)
+        # print("middle: " + str(m))
+
+        if self.problem.domain.result(city1, (city1, city2)) != None:
+            return city1
+
+        path1 += self.do_search(city1, m)
+        path2 += self.do_search(m, city2)
+
+        return path1 + path2
+
+class Aux(SearchNode):
+    def __init__(self,state,parent):
+        super().__init__(state, parent)
+        self.depth = 0
+        self.offset = 0
 
 
 class MinhasCidades(Cidades):
@@ -116,15 +148,28 @@ class MySTRIPS(STRIPS):
 #         new_actions.append(act)
 #     return new_actions
 
-def sorter(item):
-    depth = get_depth(item)
-
-    return depth - item.parent.children.index(item)
-
 def get_depth(item):
     if item.parent == None:
-        return 1
+        return 0
     return 1 + get_depth(item.parent)
+
+def get_num(node):
+    if node.parent == None:
+        return 0
+
+    depth = 1 + get_num(node.parent)
+
+    print("node " + str(node))
+    print(depth)
+    print(node.parent.children)
+
+    return depth - ( node.parent.children.index(node) if len(node.parent.children) != None else 0)
             
 
+def get_num(node, newnode_parent, offset):
+    if node.depth < newnode_parent.depth:
+        for nodex in node.children:
+            return get_num(nodex, newnode, offset)
+    elif node == newnode_parent.depth:
+        return offset + len(node.children)
 
