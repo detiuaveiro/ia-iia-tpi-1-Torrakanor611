@@ -1,3 +1,6 @@
+# Pedro Abreu, 93240, MIECT
+# acoselhei-me com Maria Rocha, LEI, 93320
+
 from tree_search import *
 from cidades import *
 from strips import *
